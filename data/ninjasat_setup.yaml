@@ -1,0 +1,19 @@
+tle_file: "C:/Users/tkent/Box/Per_201442_kentaro Taniguchi/ninjasat_github/data/ninjasat.tle"
+tle_name: "Ninjasat"
+ground_station_longitude_deg: 25.2797
+ground_station_latitude_deg: 54.6872
+ground_station_altitude_m: 112
+lookuptable_hvoff: "C:/Users/tkent/Box/Per_201442_kentaro Taniguchi/ninjasat_github/data/lookuptable_hvoff.csv"
+file_cutoffrigidity: "C:/Users/tkent/Box/Per_201442_kentaro Taniguchi/ninjasat_github/data/cor/cutrig-170312a400kp3.dat"
+obs_target_list: "C:/Users/tkent/Box/Per_201442_kentaro Taniguchi/ninjasat_github/data/target_list_original.csv"
+ground_station_list : "C:/Users/tkent/Box/Per_201442_kentaro Taniguchi/ninjasat_github/data/ground_station_list.csv"
+cormap_lon_nbin: 72
+cormap_lat_nbin: 36
+maxi_rbm_directory: "C:/Users/tkent/Box/Per_201442_kentaro Taniguchi/ninjasat_github/data/rbmmap_dst"
+maxi_rbm_pic_directory : "C:/Users/tkent/Box/Per_201442_kentaro Taniguchi/ninjasat_github/data/maxi_rbm_list.binaryfile"
+maxi_rbm_selected_basename_h: "dst_h_-223--51"
+maxi_rbm_selected_basename_z: "dst_z_-223--51"
+hv_allowed_maxi_rbm_threshold: 5
+sight_elevation: 10
+sun_separation_angle: 35
+moon_separation_angle: 35

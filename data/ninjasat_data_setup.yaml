@@ -1,0 +1,18 @@
+# units are all Byte for size and Hz for frequency
+GMC_HK_size_Byte: 32
+GMC_HK_frequency_Hz: 0.125
+GMC_command_log_size_Byte: 0
+GMC_command_log_frequency_Hz: 0
+GPS_size_Byte: 16
+GPS_frequency_Hz: 0.125
+RBM_HK_size_Byte: 28
+RBM_HK_frequency_Hz: 0.125
+Event_Crab_size_Byte: 4
+Event_Crab_frequency_Hz: 0
+Event_Crab_cal_size_Byte: 8
+Event_Crab_cal_frequency_Hz: 50
+Event_Sco_size_Byte: 4
+Event_Sco_frequency_Hz: 460
+Event_Sco_cal_size_Byte: 8
+Event_Sco_cal_frequency_Hz: 0
+Downlink_Mbps: 1 #Mbps
