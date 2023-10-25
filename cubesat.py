@@ -235,6 +235,11 @@ class CubeSat():
 					 self.df.loc[index2, 'ySunVect'],
 					 self.df.loc[index2, 'zSunVect']])
 				earthVect = -satVect
+
+				self.df.loc[index2, 'xTargVec_'+row["Name"]] = xVect[0]
+				self.df.loc[index2, 'yTargVec_'+row["Name"]] = xVect[1]
+				self.df.loc[index2, 'zTargVec_'+row["Name"]] = xVect[2]
+
 				flag, el, x_dist = self.at_earth_occult(satVect, xVect, sunVect)
 				self.df.loc[index2, 'visFlag_'+row["Name"]] = flag
 				self.df.loc[index2, 'visEl_'+row["Name"]] = el
@@ -245,11 +250,8 @@ class CubeSat():
 
 				self.df.loc[index2, 'angDistFlagMoon_'+row["Name"]] = (self.ang_distance(xVect, moonVect)*self.RAD2DEG > self.moon_sep_angle)
 				self.df.loc[index2, 'angDistFlagSun_'+row["Name"]] = (self.ang_distance(xVect, sunVect)*self.RAD2DEG > self.sun_sep_angle)
-				self.df.loc[index2, 'angDistFlagEarth_'+row["Name"]] = (x_dist > self.param['sight_elevation'])
 
-				self.df.loc[index2, 'xTargVec_'+row["Name"]] = xVect[0]
-				self.df.loc[index2, 'yTargVec_'+row["Name"]] = xVect[1]
-				self.df.loc[index2, 'zTargVec_'+row["Name"]] = xVect[2]
+
 
 				self.df.loc[index2, 'obsFlag_'+row["Name"]] = (self.df.loc[index2, 'visFlag_'+row["Name"]] == 0)*(self.df.loc[index2, 'angDistFlagMoon_'+row["Name"]] == 1)*(self.df.loc[index2, 'angDistFlagSun_'+row["Name"]] == 1)
 
