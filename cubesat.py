@@ -51,6 +51,9 @@ class CubeSat():
 		self.df = None
 		self.utc_time_init = start_date_utc
 		self.utc_time_end = end_date_utc
+		self.jst_time_init = self.utcstr2jststr(self.utc_time_init)
+		self.jst_time_end = self.utcstr2jststr(self.utc_time_end)
+
 		self.time_bin_min = timebin_minute
 		# self.dcm_init = None
 		# self.q_init = np.array([0, 0, 0, 0])
@@ -194,10 +197,10 @@ class CubeSat():
 				self.df.loc[index, 'yMoonVect'] = np.cos(moon.dec) * np.sin(moon.ra)
 				self.df.loc[index, 'zMoonVect'] = np.sin(moon.dec)
 
-				moonVect = np.array([self.df.loc[index, 'xSunVect'],
+				sunVect = np.array([self.df.loc[index, 'xSunVect'],
 					self.df.loc[index, 'ySunVect'],
 					self.df.loc[index, 'zSunVect']])
-				sunVect = np.array([self.df.loc[index, 'xMoonVect'],
+				moonVect = np.array([self.df.loc[index, 'xMoonVect'],
 					self.df.loc[index, 'yMoonVect'],
 					self.df.loc[index, 'zMoonVect']])
 
@@ -996,7 +999,78 @@ class CubeSat():
 		ax.set_yticks([-90,-60,-30,0,30,60,90])
 		plt.savefig("result/result_plot_observer_vis.pdf", format="pdf")
 
+	def plot_observer_vis_v2(self):
+		fig = plt.figure(figsize=(12,8))
+		plt.clf()
+		ax = plt.axes(projection=ccrs.PlateCarree())
+		prev_point = None
 
+		# Loop for dataframe, time series
+		for index2, row2 in self.df.iterrows():
+			# total index flags, 0 means no communication with any ground station, 1 means communication with a ground station
+			obs_vis_ind = 0
+			# Loop for ground stations, location series
+			for index, row in self.gs_df.iterrows():
+
+				if self.df.loc[index2, 'gsFlag_'+row["Name"]] == 1:
+					obs_vis_ind = 1
+					# a ground station has been found, plot the location as a communication point
+					break
+				else:
+					obs_vis_ind = 0
+
+			if obs_vis_ind == 1:
+				ax.scatter(self.df.loc[index2, 'Longitude'], self.df.loc[index2, 'Latitude'],
+					transform=ccrs.PlateCarree(), marker='x', s=20, c="r")
+				if index2 % 2 ==0:
+					ax.text(self.df['Longitude'][index2], self.df['Latitude'][index2], self.utcstr2jststr(self.df['Time'][index2]), fontsize=8)
+			else:
+				ax.scatter(self.df.loc[index2, 'Longitude'], self.df.loc[index2, 'Latitude'],
+					transform=ccrs.PlateCarree(), marker='x', s=20, c="b")
+
+				if index2 % 10 ==0:
+					ax.text(self.df['Longitude'][index2], self.df['Latitude'][index2], self.utcstr2jststr(self.df['Time'][index2]), fontsize=8)
+				if index2 ==0:
+					ax.text(self.df['Longitude'][index2], self.df['Latitude'][index2], self.utcstr2jststr(self.df['Time'][index2]), fontsize=8, color = 'red')
+				if index2 ==self.df.index[-1]:
+					ax.text(self.df['Longitude'][index2], self.df['Latitude'][index2], self.utcstr2jststr(self.df['Time'][index2]), fontsize=8, color = 'red')
+
+
+			# plot current and previous points with lines
+			# current_point = (self.df.loc[index2, 'Longitude'], self.df.loc[index2, 'Latitude'])
+			# if prev_point is not None:
+			# 	ax.plot([prev_point[0], current_point[0]], [prev_point[1], current_point[1]],
+			# 		c="b", transform=ccrs.PlateCarree())
+			# prev_point = current_point
+
+		# add text label on each location
+		# for i in range(len(self.df)):
+		# 	if i % 10 == 0:
+		# 		ax.text(self.df['Longitude'][i], self.df['Latitude'][i], self.df['Time'][i], fontsize=8)
+
+		# plot ground station location, adustment of "+2" for avoiding overlap
+		for index_gs, row_gs in self.gs_df.iterrows():
+			ax.scatter(row_gs['long'], row_gs['lat'],
+				transform=ccrs.PlateCarree(), marker='D', s=30, c="m")
+			ax.text(row_gs['long']+2, row_gs['lat']+2, row_gs['Name'], transform=ccrs.PlateCarree(), fontsize=10, c="m")
+
+		ax.set_global()
+		ax.coastlines(linewidth=0.5)
+		gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=False,
+			linewidth=1, color='gray', alpha=0.3, linestyle='--')
+		ax.set_xlim(-180.0,180.0)
+		ax.set_ylim(-90.0,90.0)
+		ax.set_xlabel('Longitude (deg)')
+		ax.set_ylabel('Latitude (deg)')
+		ax.set_xticks([-180,-120,-60,0,60,120,180])
+		ax.set_yticks([-90,-60,-30,0,30,60,90])
+		title = f"From {self.jst_time_init} to {self.jst_time_end} (JST) every {self.time_bin_min} min"
+		ax.set_title(title)
+
+		filename_time_init = self.jst_time_init.replace(':', '').replace(' ', '_')
+		filename_time_end = self.jst_time_end.replace(':', '').replace(' ', '_')
+		filename = f"result/result_plot_observer_vis_v2_{filename_time_init}_to_{filename_time_end}.pdf"
+		plt.savefig(filename, format="pdf")
 
 	def setup_maxi_rbm_index(self):
 
@@ -1187,7 +1261,9 @@ class CubeSat():
 	# 	# https://numpy.org/doc/stable/reference/generated/numpy.histogram2d.html
 	# 	open(self.param["lookuptable_hvoff"])
 
-
+	def utcstr2jststr(self, time_str):
+		jst_time_timestamp = datetime.datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S') + datetime.timedelta(hours=9)
+		return jst_time_timestamp.strftime('%Y-%m-%d %H:%M:%S')
 
 	def datetime2mjd(self,time_datetime):
 		julian_day = time_datetime.toordinal() + 1721425.5
